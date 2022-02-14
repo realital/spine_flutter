@@ -143,6 +143,6 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<SkeletonAnimation> loadSkeleton() async {
     final String pathToModel = '$pathPrefix$name';
 
-    return SkeletonAnimation.createWithFiles(AssetsPathBuilder(pathToModel));
+    return SkeletonAnimation.create(AssetsPathBuilder(pathToModel));
   }
 }

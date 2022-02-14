@@ -15,7 +15,7 @@ class SkeletonAnimation extends core.Skeleton {
     state.update(delta);
   }
 
-  static Future<SkeletonAnimation> createWithFiles(Builder builder) async {
+  static Future<SkeletonAnimation> create(Builder builder) async {
     final Map<String, dynamic> assets = <String, dynamic>{};
     final List<Future<MapEntry<String, dynamic>>> futures =
         <Future<MapEntry<String, dynamic>>>[
