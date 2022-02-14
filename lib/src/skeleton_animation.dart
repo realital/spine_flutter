@@ -15,43 +15,37 @@ class SkeletonAnimation extends core.Skeleton {
     state.update(delta);
   }
 
-  static Future<SkeletonAnimation> createWithFiles(
-    String name, {
-    String pathBase = '',
-    String rawAtlas = '',
-    String rawSkeleton = '',
-    Uint8List? rawTexture,
-  }) async {
-    final String atlasDataFile = '$name.atlas';
-    final String skeletonDataFile = '$name.json';
-    final String path = '$pathBase$name/';
-
+  static Future<SkeletonAnimation> createWithFiles(Builder builder) async {
     final Map<String, dynamic> assets = <String, dynamic>{};
     final List<Future<MapEntry<String, dynamic>>> futures =
         <Future<MapEntry<String, dynamic>>>[
-      AssetLoader.loadJson(path + skeletonDataFile, rawSkeleton),
-      AssetLoader.loadText(path + atlasDataFile, rawAtlas),
+      builder.buildJson(),
+      builder.buildAtlas(),
     ];
 
     final List<String> textureDataFiles =
-        await textureFilesFromAtlas(path + atlasDataFile);
+        await textureFilesFromAtlas(builder.pathToAtlasDataFile);
     for (final String textureDataFile in textureDataFiles) {
       final Future<MapEntry<String, dynamic>> entry =
-          AssetLoader.loadTexture(path + textureDataFile, rawTexture);
+          builder.buildTexture(textureDataFile);
       futures.add(entry);
     }
 
-    await Future.wait(futures)
-        .then(assets.addEntries)
-        .catchError((Object e) => Fimber.d("Couldn't add entries", ex: e));
+    await Future.wait(futures).then(assets.addEntries).catchError((Object e) {
+      if (kDebugMode) {
+        print("Couldn't add entries. $e");
+      }
+    });
 
     final core.TextureAtlas atlas = core.TextureAtlas(
-        assets[path + atlasDataFile], (String? p) => assets[path + (p ?? '')]);
+      assets[builder.pathToAtlasDataFile],
+      (String? p) => p == null ? '' : assets['${builder.path}/$p'],
+    );
     final core.AtlasAttachmentLoader atlasLoader =
         core.AtlasAttachmentLoader(atlas);
     final core.SkeletonJson skeletonJson = core.SkeletonJson(atlasLoader);
     final core.SkeletonData skeletonData =
-        skeletonJson.readSkeletonData(assets[path + skeletonDataFile]);
+        skeletonJson.readSkeletonData(assets[builder.pathToSkeletonDataFile]);
 
     return SkeletonAnimation(skeletonData);
   }

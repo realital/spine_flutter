@@ -140,9 +140,9 @@ class _MyHomePageState extends State<MyHomePage> {
         .toSet();
   }
 
-  Future<SkeletonAnimation> loadSkeleton() async =>
-      SkeletonAnimation.createWithFiles(
-        name,
-        pathBase: pathPrefix,
-      );
+  Future<SkeletonAnimation> loadSkeleton() async {
+    final String pathToModel = '$pathPrefix$name';
+
+    return SkeletonAnimation.createWithFiles(AssetsPathBuilder(pathToModel));
+  }
 }
