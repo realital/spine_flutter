@@ -7,6 +7,12 @@ class SkeletonAnimation extends core.Skeleton {
 
   final core.AnimationState state;
 
+  void dispose() {
+    for(core.TrackEntry? track in state.tracks) {
+      state.queue.dispose(track!);
+    }
+  }
+
   void applyState() {
     state.apply(this);
   }

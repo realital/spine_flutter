@@ -62,6 +62,11 @@ class SkeletonRenderObjectWidget extends LeafRenderObjectWidget {
       ..debugRendering = debugRendering
       ..triangleRendering = triangleRendering;
   }
+
+  // @override
+  // void didUnmountRenderObject(covariant RenderObject renderObject) {
+  //   renderObject.dispose();
+  // }
 }
 
 class SkeletonRenderObject extends RenderBox {
@@ -80,8 +85,19 @@ class SkeletonRenderObject extends RenderBox {
   bool? _triangleRendering;
   Float32List _vertices = Float32List(8 * 1024);
   double _lastFrameTime = 0.0;
+  bool _isDisposed = false;
+
+  @override
+  void dispose() {
+    _isDisposed = true;
+    super.dispose();
+  }
 
   void beginFrame(Duration timeStamp) {
+    if(_isDisposed) {
+      return;
+    }
+
     final double t =
         timeStamp.inMicroseconds / Duration.microsecondsPerMillisecond / 1000.0;
 
